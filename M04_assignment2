@@ -1,0 +1,78 @@
+// 11/13/23
+// Pierce Mohney
+// SDEV 200
+// Assignment 4-2
+//This program will count specified keywords in a program excluding keywords in comments and strings.
+
+import java.util.*;
+import java.io.*;
+
+public class CountKeywords {
+    public static void main(String[] args) throws Exception {
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter a Java source file: ");
+        String filename = input.nextLine();
+
+        File file = new File(filename);
+        if (file.exists()) {
+            System.out.println("The number of keywords in " + filename
+                    + " is " + countKeywords(file));
+        } else {
+            System.out.println("File " + filename + " does not exist");
+        }
+    }
+
+    public static int countKeywords(File file) throws Exception {
+        // Array of all Java keywords + true, false and null
+        String[] keywordString = {"abstract", "assert", "boolean",
+                "break", "byte", "case", "catch", "char", "class", "const",
+                "continue", "default", "do", "double", "else", "enum",
+                "extends", "for", "final", "finally", "float", "goto",
+                "if", "implements", "import", "instanceof", "int",
+                "interface", "long", "native", "new", "package", "private",
+                "protected", "public", "return", "short", "static",
+                "strictfp", "super", "switch", "synchronized", "this",
+                "throw", "throws", "transient", "try", "void", "volatile",
+                "while", "true", "false", "null"};
+
+        Set<String> keywordSet =
+                new HashSet<>(Arrays.asList(keywordString));
+        int count = 0;
+
+        Scanner input = new Scanner(file);
+        boolean withinComment = false;
+        boolean withinString = false;
+
+        while (input.hasNext()) {
+            String word = input.next();
+
+            if (word.startsWith("//")) {
+                break;
+            } else if (word.startsWith("/*")) {
+                withinComment = true;
+            }
+        //Excludes words in comments
+
+            if (withinString) {
+                if (word.endsWith("\"") || word.endsWith("'")) {
+                    withinString = false;
+                }
+            } else if (word.startsWith("\"") || word.startsWith("'")) {
+                withinString = true;
+            }
+        //Excludes words in strings
+
+            // Count the keyword if not within a comment or a string
+            if (!withinComment && !withinString && keywordSet.contains(word)) {
+                count++;
+            }
+        //Counts words that are not within comment or string
+
+            if (withinComment && word.endsWith("*/")) {
+                withinComment = false;
+            }
+        }
+
+        return count;
+    }
+}
